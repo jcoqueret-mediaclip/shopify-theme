@@ -532,16 +532,15 @@
 
   const displayValidationMessageForProjects = (errors) => {
     for(error of errors) {
-      var projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-      validationMessageElement = document.createElement('div');
+      let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
+      let validationMessageElement = document.createElement('div');
       validationMessageElement.style.color = 'red';
-      validationMessageElement.innerHTML = `An error occured when validating this project (${error.problemId})`
+      validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
       projectCartElement.prepend(validationMessageElement);
     }
   };
   
   const displayValidationMessage = (msg, projectId) => {
-    
       let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
       let validationMessageElement = document.querySelector('#cart-validation-error');
       
@@ -579,10 +578,14 @@
     let mediaclipCartApi = mediaclipShopify.getCartApi();
     await mediaclipCartApi.init();
 
+    console.debug('onMediaclipReady')
+
     let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
     for (let cartItem of visibleCartItems) {
       let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
       quantityInputElement.addEventListener('change', inputDebounce(600, async (event) => {
+        console.debug('quantity updated', event);
+
         // Disable the other cart buttons to avoid multiple concurent changes with undetermined results
         document.getElementById('checkout').disabled = true;
 
@@ -597,6 +600,8 @@
 
     let checkoutButton = document.getElementById('checkout');
     checkoutButton.addEventListener('click', async (event) => {
+      console.debug('checkout button clicked', event);
+
       // Prevent default checkout behavior
       event.preventDefault();
 
@@ -605,7 +610,8 @@
 
       // Run validation
       let validationResult = await mediaclipCartApi.executeMediaclipValidationAndFixCart(false);
- 
+      console.debug('validation result', validationResult);
+
       // Interpret the validation result
       if (validationResult.result === "Error") {
         displayValidationMessageForProjects(validationResult.errors);
