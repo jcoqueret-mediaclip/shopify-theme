@@ -650,10 +650,11 @@
       }
     );
 
-    document.getElementById('checkout').disabled = false;
-
+    setupQuantityChangeButtons(mediaclipCartApi);
     setupCheckoutButton(mediaclipCartApi);
     refreshThumbnails(mediaclipCartApi);
+
+    document.getElementById('checkout').disabled = false;
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
