@@ -544,9 +544,10 @@
 
       let validationMessageElement = document.createElement('tr');
       let validationMessageCellElement = document.createElement('td');
-      validationMessageElement.appendChild(validationMessageCellElement);
+      validationMessageCellElement.setAttribute('colspan', '3'); // Adjust the number based on your table
       validationMessageCellElement.style.color = 'red';
       validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
+      validationMessageElement.appendChild(validationMessageCellElement);
       cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
     }
   };
