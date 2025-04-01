@@ -538,6 +538,7 @@
           console.debug('found error for project' + `[data-mc-project-id='${error.projectId}']`);
           let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
           let validationMessageElement = document.createElement('tr');
+          let validationMessageCellElement = document.createElement('td');
           validationMessageElement.style.color = 'red';
           validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
           projectCartElement.insertAdjacentElement("afterend", validationMessageElement);
