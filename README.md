@@ -17,12 +17,6 @@ While Mediaclip offers built-in theme blocks for handling personalized products 
 
 This sample theme is intended as a reference implementation rather than a production-ready solution. It illustrates key integration points and code patterns that developers can adapt to their own themes and specific requirements.
 
-## Installation
-
-1. Clone this repository
-2. Deploy to a Shopify development store with Mediaclip already installed
-3. Configure the theme settings as needed
-
 ## Key Implementation Files
 
 - `main-cart-items.liquid`: Modified cart template and inject custom JavaScript
@@ -33,6 +27,13 @@ This sample theme is intended as a reference implementation rather than a produc
 ### Cart Initialization
 
 ```javascript
+let onMediaclipReady = async () => {
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init(...);
+    // ...
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (window.mediaclipShopify === undefined) {
     document.addEventListener('OnMediaclipShopifyReady', async () => {
@@ -70,7 +71,3 @@ For comprehensive details on the Mediaclip Shopify JavaScript Cart API, please r
 ## Support
 
 This sample repository is provided as a reference implementation. For support with your own Mediaclip integration, please contact the Mediaclip support team.
-
-## License
-
-[Include appropriate license information here]
