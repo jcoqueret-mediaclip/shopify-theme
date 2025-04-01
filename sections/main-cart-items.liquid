@@ -630,9 +630,11 @@
     refreshThumbnails(mediaclipCartApi);
   }
 
-  // Disable the Checkout button while loading to ensure cart consistency and validation to be run
-  document.getElementById('checkout').disabled = true;
+  
   document.addEventListener("DOMContentLoaded", async () => {
+    // Disable the Checkout button while loading to ensure cart consistency and validation to be run
+    document.getElementById('checkout').disabled = true;
+    
     if (window.mediaclipShopify === undefined) {
       document.addEventListener('OnMediaclipShopifyReady', async () => {
         await onMediaclipReady();
