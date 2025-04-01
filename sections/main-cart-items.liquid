@@ -573,32 +573,52 @@
     }
   }
 
-  let onMediaclipReady = async () => {
-    let mediaclipShopify = window.mediaclipShopify;
-    let mediaclipCartApi = mediaclipShopify.getCartApi();
-    await mediaclipCartApi.init();
+  const setupQuantityChangeButtons = (mediaclipCartApi) => {
+    let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems();
+    for (let cartItem of visibleCartItems) {
+      let quantityInputElement = document.querySelector(
+              `[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`
+      );
+      quantityInputElement.addEventListener(
+              "change",
+              inputDebounce(600, async (event) => {
+                // Disable the other cart buttons to prevent concurrent operations that could lead to inconsistent state
+                document.getElementById("checkout").disabled = true;
 
+                // Update the quantity of the line item and update related lines (synchronize quantities/secondary parts)
+                mediaclipCartApi.setMainItemQuantity(
+                        cartItem,
+                        +quantityInputElement.value
+                );
+
+                // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
+                await mediaclipCartApi.saveCart();
+                document.getElementById("checkout").disabled = false;
+              })
+      );
+    }
+  }
+
+  let onMediaclipReady = async () => {
     console.debug('onMediaclipReady')
 
-    let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
-    for (let cartItem of visibleCartItems) {
-      let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
-      quantityInputElement.addEventListener('change', inputDebounce(600, async (event) => {
-        console.debug('quantity updated', event);
-
-        // Disable the other cart buttons to avoid multiple concurent changes with undetermined results
-        document.getElementById('checkout').disabled = true;
-
-        // Update the quantity of the line, and update related line (sync quantities / secondary parts)
-        mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value)
-
-        // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
-        await mediaclipCartApi.saveCart(); 
-        document.getElementById('checkout').disabled = false;
-      }));
-    }
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init(
+        ["main-cart-items", "cart-icon-bubble"], // main cart section to be render when cart is updated
+        null,
+        (updatedSections) => {
+          // replace the html with the re-rendered section
+          document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
+          document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
+          // subscribe to the quantity changes (see section Handle quantity changes)
+          setupQuantityChangeButtons(mediaclipCartApi);
+        }
+    );
 
     let checkoutButton = document.getElementById('checkout');
+    checkoutButton.disabled = false;
+
     checkoutButton.addEventListener('click', async (event) => {
       console.debug('checkout button clicked', event);
 
@@ -633,8 +653,6 @@
     refreshThumbnails(mediaclipCartApi);
   }
 
-  
-  
   document.addEventListener("DOMContentLoaded", async () => {
     if (window.mediaclipShopify === undefined) {
       document.addEventListener('OnMediaclipShopifyReady', async () => {
