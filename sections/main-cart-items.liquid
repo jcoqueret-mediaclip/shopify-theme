@@ -564,6 +564,7 @@
   }
 
   const setupQuantityChangeButtons = (mediaclipCartApi) => {
+    console.log('setupQuantityChangeButtons');
     let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
     for (let cartItem of visibleCartItems) {
       let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
