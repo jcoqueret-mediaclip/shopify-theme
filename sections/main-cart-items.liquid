@@ -551,7 +551,7 @@
           validationMessageElement.appendChild(validationMessageCellElement);
           validationMessageCellElement.style.color = 'red';
           validationMessageCellElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
-          variantCartElement.insertAdjacentElement("afterend", validationMessageCellElement);
+          variantCartElement.insertAdjacentElement("afterend", validationMessageElement);
       }
     }
   };
