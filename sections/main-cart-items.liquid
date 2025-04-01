@@ -604,26 +604,8 @@
     }
   }
 
-  let onMediaclipReady = async () => {
-    console.debug('onMediaclipReady')
-
-    let mediaclipShopify = window.mediaclipShopify;
-    let mediaclipCartApi = mediaclipShopify.getCartApi();
-    await mediaclipCartApi.init(
-            ["main-cart-items", "cart-icon-bubble"], // main cart section to be render when cart is updated
-            null,
-            (updatedSections) => {
-              // replace the html with the re-rendered section
-              document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
-              document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
-              // subscribe to the quantity changes (see section Handle quantity changes)
-              setupQuantityChangeButtons(mediaclipCartApi);
-            }
-    );
-
+  const setupCheckoutButton = (mediaclipCartApi) => {
     let checkoutButton = document.getElementById('checkout');
-    checkoutButton.disabled = false;
-
     checkoutButton.addEventListener('click', async (event) => {
       console.debug('Checkout button clicked', event);
 
@@ -649,7 +631,28 @@
 
       checkoutButton.disabled = false;
     });
+  }
 
+  let onMediaclipReady = async () => {
+    console.debug('onMediaclipReady')
+
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init(
+      ["main-cart-items", "cart-icon-bubble"], // list of section to be re-render when the cart is udpated
+      null,
+      (updatedSections) => {
+        // replace the HTML with the re-rendered sections
+        document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
+        document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
+        // subscribe to the quantity changes (see section Handle quantity changes)
+        setupQuantityChangeButtons(mediaclipCartApi);
+      }
+    );
+
+    document.getElementById('checkout').disabled = false;
+
+    setupCheckoutButton(mediaclipCartApi);
     refreshThumbnails(mediaclipCartApi);
   }
 
