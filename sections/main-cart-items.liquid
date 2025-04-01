@@ -531,7 +531,7 @@
   };
 
   const displayValidationMessageForProjects = (errors) => {
-    for(error of errors) {
+    for(let error of errors) {
       console.debug('Processing validation error ', error);
 
       let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
