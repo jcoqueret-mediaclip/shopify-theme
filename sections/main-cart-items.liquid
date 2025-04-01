@@ -534,12 +534,12 @@
     // First, remove all existing validation messages
     const existingMessages = document.querySelectorAll('.validation-error-message');
     existingMessages.forEach(element => element.remove());
-    
+
     // validation.errors contains de details of each error
     // validation.errors[0].projectId | variantId can be used to identify the line on error
     // validation.errors[0].problemId can be used to identify the error
-    
-    for(let error of errors) {
+
+    for (let error of errors) {
       console.debug('Processing validation error', error);
 
       let cartLineItemElement;
@@ -552,12 +552,12 @@
       if (cartLineItemElement) {
         let validationMessageElement = document.createElement('tr');
         validationMessageElement.className = 'validation-error-message';
-        
+
         let validationMessageCellElement = document.createElement('td');
         validationMessageCellElement.setAttribute('colspan', '3');
         validationMessageCellElement.style.color = 'red';
         validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
-        
+
         validationMessageElement.appendChild(validationMessageCellElement);
         cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
       }
@@ -567,7 +567,7 @@
   const refreshThumbnails = async (mediaclipCartApi) => {
     // Call the async function to refresh thumbnails
     let refreshResult = await mediaclipCartApi.refreshMediaclipProjectThumbnails();
-        // Check if we have thumbnail URLs in the result
+    // Check if we have thumbnail URLs in the result
     if (refreshResult && refreshResult.thumbnailUrlsPerProjectId) {
       Object.entries(refreshResult.thumbnailUrlsPerProjectId).forEach(([projectId, thumbnailUrl]) => {
         const projectElement = document.querySelector(`[data-mc-project-id="${projectId}"]`);
@@ -594,7 +594,7 @@
                 document.getElementById("checkout").disabled = true;
 
                 // Update the quantity of the line item and update related lines (synchronize quantities/secondary parts)
-                mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value );
+                mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value);
 
                 // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
                 await mediaclipCartApi.saveCart();
@@ -610,15 +610,15 @@
     let mediaclipShopify = window.mediaclipShopify;
     let mediaclipCartApi = mediaclipShopify.getCartApi();
     await mediaclipCartApi.init(
-        ["main-cart-items", "cart-icon-bubble"], // main cart section to be render when cart is updated
-        null,
-        (updatedSections) => {
-          // replace the html with the re-rendered section
-          document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
-          document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
-          // subscribe to the quantity changes (see section Handle quantity changes)
-          setupQuantityChangeButtons(mediaclipCartApi);
-        }
+            ["main-cart-items", "cart-icon-bubble"], // main cart section to be render when cart is updated
+            null,
+            (updatedSections) => {
+              // replace the html with the re-rendered section
+              document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
+              document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
+              // subscribe to the quantity changes (see section Handle quantity changes)
+              setupQuantityChangeButtons(mediaclipCartApi);
+            }
     );
 
     let checkoutButton = document.getElementById('checkout');
@@ -640,12 +640,10 @@
       // Interpret the validation result
       if (validationResult.result === "Error") {
         displayValidationMessages(validationResult.errors);
-      }
-      else if (validationResult.result === "Fixed") {
+      } else if (validationResult.result === "Fixed") {
         displayValidationMessages(validationResult.errors);
         await mediaclipCartApi.saveCart();
-      }
-      else if (validationResult.result === "Ok") {
+      } else if (validationResult.result === "Ok") {
         checkoutButton.form.submit();
       }
 
