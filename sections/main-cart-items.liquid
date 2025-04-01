@@ -544,6 +544,7 @@
 
       let validationMessageElement = document.createElement('tr');
       let validationMessageCellElement = document.createElement('td');
+      validationMessageElement.appendChild(validationMessageCellElement);
       validationMessageCellElement.style.color = 'red';
       validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
       cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
