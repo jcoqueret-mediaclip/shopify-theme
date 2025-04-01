@@ -537,13 +537,6 @@
     for (let error of errors) {
       console.debug('Processing validation error', error);
 
-      /*let cartLineItemElement;
-      if (error.projectId) {
-        cartLineItemElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-      } else {
-        cartLineItemElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
-      }*/
-
       // Select the appropriate cart item element
       let cartLineItemElement = error.projectId
               ? document.querySelector(`[data-mc-project-id='${error.projectId}']`)
