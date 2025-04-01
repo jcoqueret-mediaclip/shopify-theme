@@ -563,11 +563,7 @@
     }
   }
 
-  let onMediaclipReady = async () => {
-    let mediaclipShopify = window.mediaclipShopify;
-    let mediaclipCartApi = mediaclipShopify.getCartApi();
-    await mediaclipCartApi.init();
-
+  const setupQuantityChangeButtons = (mediaclipCartApi) => {
     let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
     for (let cartItem of visibleCartItems) {
       let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
@@ -583,6 +579,18 @@
         document.getElementById('checkout').disabled = false;
       }));
     }
+  }
+  
+  let onMediaclipReady = async () => {
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init(
+      ["main-cart-items"],
+      null,
+      () => {
+        setupQuantityChangeButtons(mediaclipCartApi);
+      }
+    );
 
     let checkoutButton = document.getElementById('checkout');
     checkoutButton.addEventListener('click', async (event) => {
