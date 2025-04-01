@@ -531,23 +531,23 @@
   };
 
   const displayValidationMessages = (errors) => {
-    // First, remove all existing validation messages
-    const existingMessages = document.querySelectorAll('.validation-error-message');
-    existingMessages.forEach(element => element.remove());
-
-    // validation.errors contains de details of each error
-    // validation.errors[0].projectId | variantId can be used to identify the line on error
-    // validation.errors[0].problemId can be used to identify the error
+    // First, Remove all existing validation messages
+    document.querySelectorAll('.validation-error-message').forEach(el => el.remove());
 
     for (let error of errors) {
       console.debug('Processing validation error', error);
 
-      let cartLineItemElement;
+      /*let cartLineItemElement;
       if (error.projectId) {
         cartLineItemElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
       } else {
         cartLineItemElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
-      }
+      }*/
+
+      // Select the appropriate cart item element
+      let cartLineItemElement = error.projectId
+              ? document.querySelector(`[data-mc-project-id='${error.projectId}']`)
+              : document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
 
       if (cartLineItemElement) {
         let validationMessageElement = document.createElement('tr');
