@@ -546,7 +546,8 @@
           console.debug('found error for variant' + `[data-mc-shopify-variant-id='${error.variantId}']`);
           let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
           let validationMessageElement = document.createElement('tr');
-          let validationMessageCellElement = validationMessageElement.appendChild('td');
+          let validationMessageCellElement = document.createElement('td');
+          validationMessageElement.appendChild(validationMessageCellElement);
           validationMessageCellElement.style.color = 'red';
           validationMessageCellElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
           variantCartElement.insertAdjacentElement("afterend", validationMessageCellElement);
