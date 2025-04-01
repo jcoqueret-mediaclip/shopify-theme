@@ -534,25 +534,19 @@
     for(let error of errors) {
       console.debug('Processing validation error ', error);
 
-      if(error.projectId) {
-          console.debug('found error for project' + `[data-mc-project-id='${error.projectId}']`);
-          let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-          let validationMessageElement = document.createElement('tr');
-          let validationMessageCellElement = document.createElement('td');
-          validationMessageElement.style.color = 'red';
-          validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
-          projectCartElement.insertAdjacentElement("afterend", validationMessageElement);
+      let cartLineItemElement;
+      if (error.projectId) {
+        cartLineItemElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
       }
-      else{
-          console.debug('found error for variant' + `[data-mc-shopify-variant-id='${error.variantId}']`);
-          let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
-          let validationMessageElement = document.createElement('tr');
-          let validationMessageCellElement = document.createElement('td');
-          validationMessageElement.appendChild(validationMessageCellElement);
-          validationMessageCellElement.style.color = 'red';
-          validationMessageCellElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
-          variantCartElement.insertAdjacentElement("afterend", validationMessageElement);
+      else {
+        cartLineItemElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
       }
+
+      let validationMessageElement = document.createElement('tr');
+      let validationMessageCellElement = document.createElement('td');
+      validationMessageCellElement.style.color = 'red';
+      validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
+      cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
     }
   };
 
