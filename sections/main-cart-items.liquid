@@ -564,7 +564,6 @@
   }
 
   const setupQuantityChangeButtons = (mediaclipCartApi) => {
-    console.log('setupQuantityChangeButtons');
     let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
     for (let cartItem of visibleCartItems) {
       let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
@@ -595,6 +594,9 @@
     );
 
     setupQuantityChangeButtons(mediaclipCartApi);
+
+    // Re-enable the checkout button now the script is loaded
+    document.getElementById('checkout').disabled = false;
     
     let checkoutButton = document.getElementById('checkout');
     checkoutButton.addEventListener('click', async (event) => {
@@ -628,8 +630,8 @@
     refreshThumbnails(mediaclipCartApi);
   }
 
-  
-  
+  // Disable the Checkout button while loading to ensure cart consistency and validation to be run
+  document.getElementById('checkout').disabled = true;
   document.addEventListener("DOMContentLoaded", async () => {
     if (window.mediaclipShopify === undefined) {
       document.addEventListener('OnMediaclipShopifyReady', async () => {
