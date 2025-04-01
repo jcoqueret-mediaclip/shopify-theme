@@ -534,18 +534,27 @@
     for(let error of errors) {
       console.debug('Processing validation error ', error);
 
-      let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-      let validationMessageElement = document.createElement('div');
-      validationMessageElement.style.color = 'red';
-      validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
-      projectCartElement.prepend(validationMessageElement);
+      if(error.projectId) {
+          let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
+          let validationMessageElement = document.createElement('div');
+          validationMessageElement.style.color = 'red';
+          validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
+          projectCartElement.prepend(validationMessageElement);
+      }
+      else{
+          let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
+          let validationMessageElement = document.createElement('div');
+          validationMessageElement.style.color = 'red';
+          validationMessageElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
+          variantCartElement.prepend(validationMessageElement);
+      }
     }
   };
-  
-  const displayValidationMessage = (msg, projectId) => {
+
+  const displayValidationMessage = (msg) => {
       let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
       let validationMessageElement = document.querySelector('#cart-validation-error');
-      
+
       if (!validationMessageElement) {
         // Create new error element if it doesn't exist
         validationMessageElement = document.createElement('div');
@@ -553,9 +562,9 @@
         validationMessageElement.style.color = 'red';
         validationSectionElement.prepend(validationMessageElement);
       }
-      
+
       // Update the content whether it's new or existing
-      validationMessageElement.innerHTML = msg;  
+      validationMessageElement.innerHTML = msg;
   };
 
   const refreshThumbnails = async (mediaclipCartApi) => {
