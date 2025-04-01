@@ -530,20 +530,35 @@
     };
   };
 
-  const displayValidationMessage = (msg) => {
-    let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
-    let validationMessageElement = document.querySelector('#cart-validation-error');
-    
-    if (!validationMessageElement) {
-      // Create new error element if it doesn't exist
+  const displayValidationMessageForProjects = (errors) => {
+    for(error of errors) {
+      var projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
       validationMessageElement = document.createElement('div');
-      validationMessageElement.id = 'cart-validation-error';
       validationMessageElement.style.color = 'red';
-      validationSectionElement.prepend(validationMessageElement);
+      validationMessageElement.innerHTML = `An error occured when validating this project (${error.problemId})`
+      projectCartElement.prepend(validationMessageElement);
     }
-    
-    // Update the content whether it's new or existing
-    validationMessageElement.innerHTML = msg;
+  };
+  
+  const displayValidationMessage = (msg, projectId) => {
+    if (projectId) {
+      var projectCartElement = 
+    }
+    else{
+      let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
+      let validationMessageElement = document.querySelector('#cart-validation-error');
+      
+      if (!validationMessageElement) {
+        // Create new error element if it doesn't exist
+        validationMessageElement = document.createElement('div');
+        validationMessageElement.id = 'cart-validation-error';
+        validationMessageElement.style.color = 'red';
+        validationSectionElement.prepend(validationMessageElement);
+      }
+      
+      // Update the content whether it's new or existing
+      validationMessageElement.innerHTML = msg;  
+    }
   };
 
   const refreshThumbnails = async (mediaclipCartApi) => {
@@ -563,7 +578,11 @@
     }
   }
 
-  const setupQuantityChangeButtons = (mediaclipCartApi) => {
+  let onMediaclipReady = async () => {
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init();
+
     let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems()
     for (let cartItem of visibleCartItems) {
       let quantityInputElement = document.querySelector(`[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`);
@@ -579,25 +598,7 @@
         document.getElementById('checkout').disabled = false;
       }));
     }
-  }
-  
-  let onMediaclipReady = async () => {
-    let mediaclipShopify = window.mediaclipShopify;
-    let mediaclipCartApi = mediaclipShopify.getCartApi();
-    await mediaclipCartApi.init(
-      ["main-cart-items"],
-      null,
-      (updatedSections) => {
-        document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
-        setupQuantityChangeButtons(mediaclipCartApi);
-      }
-    );
 
-    setupQuantityChangeButtons(mediaclipCartApi);
-
-    // Enable the checkout button (disabled in main-cart-footer.liquid)
-    document.getElementById('checkout').disabled = false;
-    
     let checkoutButton = document.getElementById('checkout');
     checkoutButton.addEventListener('click', async (event) => {
       // Prevent default checkout behavior
@@ -611,7 +612,7 @@
  
       // Interpret the validation result
       if (validationResult.result === "Error") {
-        displayValidationMessage("An error occurred while validating the cart. Please try again or contact support.");
+        displayValidationMessageForProjects(validationResult.errors);
         // validation.errors contains de details of each error
         // validation.errors[0].projectId | variantId can be used to identify the line on error
         // validation.errors[0].problemId can be used to identify the error
@@ -630,6 +631,7 @@
     refreshThumbnails(mediaclipCartApi);
   }
 
+  
   
   document.addEventListener("DOMContentLoaded", async () => {
     if (window.mediaclipShopify === undefined) {
