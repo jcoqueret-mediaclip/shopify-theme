@@ -546,9 +546,10 @@
           console.debug('found error for variant' + `[data-mc-shopify-variant-id='${error.variantId}']`);
           let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
           let validationMessageElement = document.createElement('tr');
-          validationMessageElement.style.color = 'red';
-          validationMessageElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
-          variantCartElement.insertAdjacentElement("afterend", validationMessageElement);
+          let validationMessageCellElement = validationMessageElement.appendChild('td');
+          validationMessageCellElement.style.color = 'red';
+          validationMessageCellElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
+          variantCartElement.insertAdjacentElement("afterend", validationMessageCellElement);
       }
     }
   };
