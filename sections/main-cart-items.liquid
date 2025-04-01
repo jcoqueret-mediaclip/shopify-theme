@@ -537,18 +537,18 @@
       if(error.projectId) {
           console.debug('found error for project' + `[data-mc-project-id='${error.projectId}']`);
           let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-          let validationMessageElement = document.createElement('div');
+          let validationMessageElement = document.createElement('tr');
           validationMessageElement.style.color = 'red';
           validationMessageElement.innerHTML = `An error occurred when validating this project (${error.problemId})`
-          projectCartElement.prepend(validationMessageElement);
+          projectCartElement.insertAdjacentElement("afterend", validationMessageElement);
       }
       else{
           console.debug('found error for variant' + `[data-mc-shopify-variant-id='${error.variantId}']`);
           let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
-          let validationMessageElement = document.createElement('div');
+          let validationMessageElement = document.createElement('tr');
           validationMessageElement.style.color = 'red';
           validationMessageElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
-          variantCartElement.prepend(validationMessageElement);
+          projectCartElement.insertAdjacentElement("afterend", validationMessageElement);
       }
     }
   };
