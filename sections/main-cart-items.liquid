@@ -587,7 +587,8 @@
     await mediaclipCartApi.init(
       ["main-cart-items"],
       null,
-      () => {
+      (updatedSections) => {
+        document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
         setupQuantityChangeButtons(mediaclipCartApi);
       }
     );
