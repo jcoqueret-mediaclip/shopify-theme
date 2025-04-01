@@ -532,6 +532,8 @@
 
   const displayValidationMessageForProjects = (errors) => {
     for(error of errors) {
+      console.debug('Processing validation error ', error);
+
       let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
       let validationMessageElement = document.createElement('div');
       validationMessageElement.style.color = 'red';
