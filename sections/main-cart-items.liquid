@@ -531,24 +531,36 @@
   };
 
   const displayValidationMessages = (errors) => {
+    // First, remove all existing validation messages
+    const existingMessages = document.querySelectorAll('.validation-error-message');
+    existingMessages.forEach(element => element.remove());
+    
+    // validation.errors contains de details of each error
+    // validation.errors[0].projectId | variantId can be used to identify the line on error
+    // validation.errors[0].problemId can be used to identify the error
+    
     for(let error of errors) {
-      console.debug('Processing validation error ', error);
+      console.debug('Processing validation error', error);
 
       let cartLineItemElement;
       if (error.projectId) {
         cartLineItemElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
-      }
-      else {
+      } else {
         cartLineItemElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
       }
 
-      let validationMessageElement = document.createElement('tr');
-      let validationMessageCellElement = document.createElement('td');
-      validationMessageCellElement.setAttribute('colspan', '3'); // Adjust the number based on your table
-      validationMessageCellElement.style.color = 'red';
-      validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
-      validationMessageElement.appendChild(validationMessageCellElement);
-      cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
+      if (cartLineItemElement) {
+        let validationMessageElement = document.createElement('tr');
+        validationMessageElement.className = 'validation-error-message';
+        
+        let validationMessageCellElement = document.createElement('td');
+        validationMessageCellElement.setAttribute('colspan', '3');
+        validationMessageCellElement.style.color = 'red';
+        validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
+        
+        validationMessageElement.appendChild(validationMessageCellElement);
+        cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
+      }
     }
   };
 
@@ -628,9 +640,6 @@
       // Interpret the validation result
       if (validationResult.result === "Error") {
         displayValidationMessages(validationResult.errors);
-        // validation.errors contains de details of each error
-        // validation.errors[0].projectId | variantId can be used to identify the line on error
-        // validation.errors[0].problemId can be used to identify the error
       }
       else if (validationResult.result === "Fixed") {
         displayValidationMessages(validationResult.errors);
