@@ -541,10 +541,7 @@
   };
   
   const displayValidationMessage = (msg, projectId) => {
-    if (projectId) {
-      var projectCartElement = 
-    }
-    else{
+    
       let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
       let validationMessageElement = document.querySelector('#cart-validation-error');
       
@@ -558,7 +555,6 @@
       
       // Update the content whether it's new or existing
       validationMessageElement.innerHTML = msg;  
-    }
   };
 
   const refreshThumbnails = async (mediaclipCartApi) => {
