@@ -535,6 +535,7 @@
       console.debug('Processing validation error ', error);
 
       if(error.projectId) {
+          console.debug('found error for project' + `[data-mc-project-id='${error.projectId}']`);
           let projectCartElement = document.querySelector(`[data-mc-project-id='${error.projectId}']`);
           let validationMessageElement = document.createElement('div');
           validationMessageElement.style.color = 'red';
@@ -542,6 +543,7 @@
           projectCartElement.prepend(validationMessageElement);
       }
       else{
+          console.debug('found error for variant' + `[data-mc-shopify-variant-id='${error.variantId}']`);
           let variantCartElement = document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
           let validationMessageElement = document.createElement('div');
           validationMessageElement.style.color = 'red';
