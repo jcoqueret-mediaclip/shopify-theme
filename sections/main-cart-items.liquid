@@ -548,7 +548,7 @@
           let validationMessageElement = document.createElement('tr');
           validationMessageElement.style.color = 'red';
           validationMessageElement.innerHTML = `An error occurred when validating this variant (${error.problemId})`
-          projectCartElement.insertAdjacentElement("afterend", validationMessageElement);
+          variantCartElement.insertAdjacentElement("afterend", validationMessageElement);
       }
     }
   };
