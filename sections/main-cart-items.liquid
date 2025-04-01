@@ -530,7 +530,7 @@
     };
   };
 
-  const displayValidationMessageForProjects = (errors) => {
+  const displayValidationMessages = (errors) => {
     for(let error of errors) {
       console.debug('Processing validation error ', error);
 
@@ -550,22 +550,6 @@
       validationMessageElement.appendChild(validationMessageCellElement);
       cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
     }
-  };
-
-  const displayValidationMessage = (msg) => {
-      let validationSectionElement = document.querySelector('#main-cart-footer .page-width');
-      let validationMessageElement = document.querySelector('#cart-validation-error');
-
-      if (!validationMessageElement) {
-        // Create new error element if it doesn't exist
-        validationMessageElement = document.createElement('div');
-        validationMessageElement.id = 'cart-validation-error';
-        validationMessageElement.style.color = 'red';
-        validationSectionElement.prepend(validationMessageElement);
-      }
-
-      // Update the content whether it's new or existing
-      validationMessageElement.innerHTML = msg;
   };
 
   const refreshThumbnails = async (mediaclipCartApi) => {
@@ -598,10 +582,7 @@
                 document.getElementById("checkout").disabled = true;
 
                 // Update the quantity of the line item and update related lines (synchronize quantities/secondary parts)
-                mediaclipCartApi.setMainItemQuantity(
-                        cartItem,
-                        +quantityInputElement.value
-                );
+                mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value );
 
                 // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
                 await mediaclipCartApi.saveCart();
@@ -631,10 +612,8 @@
     let checkoutButton = document.getElementById('checkout');
     checkoutButton.disabled = false;
 
-    console.debug('cehckoutdis', checkoutButton);
-
     checkoutButton.addEventListener('click', async (event) => {
-      console.debug('checkout button clicked', event);
+      console.debug('Checkout button clicked', event);
 
       // Prevent default checkout behavior
       event.preventDefault();
@@ -644,17 +623,17 @@
 
       // Run validation
       let validationResult = await mediaclipCartApi.executeMediaclipValidationAndFixCart(false);
-      console.debug('validation result', validationResult);
+      console.debug('Validation result', validationResult);
 
       // Interpret the validation result
       if (validationResult.result === "Error") {
-        displayValidationMessageForProjects(validationResult.errors);
+        displayValidationMessages(validationResult.errors);
         // validation.errors contains de details of each error
         // validation.errors[0].projectId | variantId can be used to identify the line on error
         // validation.errors[0].problemId can be used to identify the error
       }
       else if (validationResult.result === "Fixed") {
-        displayValidationMessage("Your cart has been updated. Please try again.");
+        displayValidationMessages(validationResult.errors);
         await mediaclipCartApi.saveCart();
       }
       else if (validationResult.result === "Ok") {
