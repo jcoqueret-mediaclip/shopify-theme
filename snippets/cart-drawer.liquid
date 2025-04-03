@@ -168,7 +168,20 @@
                         endif
                       -%}
 
-                      <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" role="row">
+                      <tr
+                        id="CartDrawer-Item-{{ forloop.index }}"
+                        class="cart-item"
+                        role="row"
+                        data-mc-shopify-cart-item-index="{{ forloop.index0 }}"
+                        data-mc-shopify-cart-item-line="{{ forloop.index }}"
+                        data-mc-shopify-cart-item-key="{{ item.key }}"
+                        data-mc-shopify-variant-id="{{ item.variant.id }}"
+                        {% if is_mc_project_line %}
+                          data-mc-module="{{ item.properties._moduleType }}"
+                          data-mc-project-id="{{ mc_project_id }}"
+                          data-mc-main-part="{{ is_main_part }}"
+                        {% endif %}
+                      >
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
                             {% comment %} Leave empty space due to a:empty CSS display: none rule {% endcomment %}
