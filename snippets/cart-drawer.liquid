@@ -677,21 +677,21 @@
               "change",
               inputDebounce(600, async (event) => {
                 // Disable the other cart buttons to prevent concurrent operations that could lead to inconsistent state
-                document.getElementById("checkout").disabled = true;
+                document.getElementById("CartDrawer-Checkout").disabled = true;
 
                 // Update the quantity of the line item and update related lines (synchronize quantities/secondary parts)
                 mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value);
 
                 // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
                 await mediaclipCartApi.saveCart();
-                document.getElementById("checkout").disabled = false;
+                document.getElementById("CartDrawer-Checkout").disabled = false;
               })
       );
     }
   }
 
   const setupCheckoutButton = (mediaclipCartApi) => {
-    let checkoutButton = document.getElementById('checkout');
+    let checkoutButton = document.getElementById('CartDrawer-Checkout');
     checkoutButton.addEventListener('click', async (event) => {
       console.debug('Checkout button clicked', event);
 
@@ -740,7 +740,7 @@
     setupCheckoutButton(mediaclipCartApi);
     refreshThumbnails(mediaclipCartApi);
 
-    document.getElementById('checkout').disabled = false;
+    document.getElementById('CartDrawer-Checkout').disabled = false;
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
