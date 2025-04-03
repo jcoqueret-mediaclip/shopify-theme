@@ -609,3 +609,147 @@
     </div>
   </div>
 </cart-drawer>
+
+<script>
+  const inputDebounce = (wait, fn) => {
+    let timeout;
+    return (...args) => {
+      const later = async () => {
+        timeout = undefined;
+        fn(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  };
+
+  const displayValidationMessages = (errors) => {
+    // First, Remove all existing validation messages
+    document.querySelectorAll('.validation-error-message').forEach(el => el.remove());
+
+    for (let error of errors) {
+      console.debug('Processing validation error', error);
+
+      // Select the appropriate cart item element
+      let cartLineItemElement = error.projectId
+              ? document.querySelector(`[data-mc-project-id='${error.projectId}']`)
+              : document.querySelector(`[data-mc-shopify-variant-id='${error.variantId}']`);
+
+      if (cartLineItemElement) {
+        let validationMessageElement = document.createElement('tr');
+        validationMessageElement.className = 'validation-error-message';
+
+        let validationMessageCellElement = document.createElement('td');
+        validationMessageCellElement.setAttribute('colspan', '3');
+        validationMessageCellElement.style.color = 'red';
+        validationMessageCellElement.innerHTML = `An error occurred when validating this project (${error.problemId})`;
+
+        validationMessageElement.appendChild(validationMessageCellElement);
+        cartLineItemElement.insertAdjacentElement("afterend", validationMessageElement);
+      }
+    }
+  };
+
+  const refreshThumbnails = async (mediaclipCartApi) => {
+    // Call the async function to refresh thumbnails
+    let refreshResult = await mediaclipCartApi.refreshMediaclipProjectThumbnails();
+    // Check if we have thumbnail URLs in the result
+    if (refreshResult && refreshResult.thumbnailUrlsPerProjectId) {
+      Object.entries(refreshResult.thumbnailUrlsPerProjectId).forEach(([projectId, thumbnailUrl]) => {
+        const projectElement = document.querySelector(`[data-mc-project-id="${projectId}"]`);
+        if (projectElement) {
+          const imageElement = projectElement.querySelector('.cart-item__image');
+          if (imageElement && thumbnailUrl) {
+            imageElement.src = thumbnailUrl;
+          }
+        }
+      });
+    }
+  }
+
+  const setupQuantityChangeButtons = (mediaclipCartApi) => {
+    let visibleCartItems = mediaclipCartApi.getMainAndNonMediaclipItems();
+    for (let cartItem of visibleCartItems) {
+      let quantityInputElement = document.querySelector(
+              `[data-mc-shopify-cart-item-line='${cartItem.identifier.line}'] input[name='updates[]'], select[name='updates[]']`
+      );
+      quantityInputElement.addEventListener(
+              "change",
+              inputDebounce(600, async (event) => {
+                // Disable the other cart buttons to prevent concurrent operations that could lead to inconsistent state
+                document.getElementById("checkout").disabled = true;
+
+                // Update the quantity of the line item and update related lines (synchronize quantities/secondary parts)
+                mediaclipCartApi.setMainItemQuantity(cartItem, +quantityInputElement.value);
+
+                // Save changes (And re-render cart if sections were registered in mediaclipCartApi.init())
+                await mediaclipCartApi.saveCart();
+                document.getElementById("checkout").disabled = false;
+              })
+      );
+    }
+  }
+
+  const setupCheckoutButton = (mediaclipCartApi) => {
+    let checkoutButton = document.getElementById('checkout');
+    checkoutButton.addEventListener('click', async (event) => {
+      console.debug('Checkout button clicked', event);
+
+      // Prevent default checkout behavior
+      event.preventDefault();
+
+      // Disable the Checkout button until validation result
+      checkoutButton.disabled = true;
+
+      // Run validation
+      let validationResult = await mediaclipCartApi.executeMediaclipValidationAndFixCart(false);
+      console.debug('Validation result', validationResult);
+
+      // Interpret the validation result
+      if (validationResult.result === "Error") {
+        displayValidationMessages(validationResult.errors);
+      } else if (validationResult.result === "Fixed") {
+        displayValidationMessages(validationResult.errors);
+        await mediaclipCartApi.saveCart();
+      } else if (validationResult.result === "Ok") {
+        checkoutButton.form.submit();
+      }
+
+      checkoutButton.disabled = false;
+    });
+  }
+
+  let onMediaclipReady = async () => {
+    console.debug('onMediaclipReady')
+
+    let mediaclipShopify = window.mediaclipShopify;
+    let mediaclipCartApi = mediaclipShopify.getCartApi();
+    await mediaclipCartApi.init(
+      ["main-cart-items", "cart-icon-bubble"], // list of section to be re-render when the cart is udpated
+      null,
+      (updatedSections) => {
+        // replace the HTML with the re-rendered sections
+        document.getElementById("main-cart-items").innerHtml = updatedSections["main-cart-items"];
+        document.getElementById("cart-icon-bubble").innerHtml = updatedSections["cart-icon-bubble"];
+        // subscribe to the quantity changes (see section Handle quantity changes)
+        setupQuantityChangeButtons(mediaclipCartApi);
+      }
+    );
+
+    setupQuantityChangeButtons(mediaclipCartApi);
+    setupCheckoutButton(mediaclipCartApi);
+    refreshThumbnails(mediaclipCartApi);
+
+    document.getElementById('checkout').disabled = false;
+  }
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (window.mediaclipShopify === undefined) {
+      document.addEventListener('OnMediaclipShopifyReady', async () => {
+        await onMediaclipReady();
+      })
+    } else {
+      await onMediaclipReady();
+    }
+  });
+</script>
