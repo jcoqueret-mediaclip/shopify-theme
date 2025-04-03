@@ -118,6 +118,56 @@
 
                   <tbody role="rowgroup">
                     {%- for item in cart.items -%}
+                      {%- liquid
+                        assign is_mc_project_line = false
+                        assign item_image_url = blank
+                        assign mc_project_id = blank
+                        assign edit_project_url = blank
+                        assign hide_line_item = false
+                        assign is_mediaclip_line = false
+                        if item.properties._app == 'mediaclip'
+                          assign is_mediaclip_line = true
+                          if item.properties._isMainPart == 'true'
+                            assign is_main_part = true
+                          else
+                            assign is_main_part = false
+                          endif
+                        endif
+                        assign original_item_image_url = blank
+                        if item.image
+                          assign original_item_image_url = item.image | image_url: width: 300
+                        endif
+                        assign item_image_url = original_item_image_url
+                        if is_mediaclip_line
+                          assign mc_project_id = item.properties._projectId
+                          assign is_mc_project_line = true
+                          assign edit_project_url = 'tools/customize?projectId=' | append: mc_project_id
+                          if item.properties._moduleType != 'Print'
+                            comment
+                              Handle special case of Buy X Get Y discounts, the cartQuantity is the sum of
+                              all the lines.
+                            endcomment
+                            assign project_quantity = 0
+                            for cart_item in cart.items
+                              if cart_item.properties._isMainPart != 'true'
+                                continue
+                              endif
+                              if cart_item.properties._projectId != mc_project_id
+                                continue
+                              endif
+                              assign project_quantity = project_quantity | plus: cart_item.quantity
+                            endfor
+                            assign edit_project_url = edit_project_url | append: '&cartQuantity=' | append: project_quantity | append: '&fromCart=true'
+                          endif
+                          if is_main_part == false
+                            assign hide_line_item = true
+                          endif
+                          if item.properties._imageurl
+                            assign item_image_url = item.properties._imageurl
+                          endif
+                        endif
+                      -%}
+
                       <tr id="CartDrawer-Item-{{ item.index | plus: 1 }}" class="cart-item" role="row">
                         <td class="cart-item__media" role="cell" headers="CartDrawer-ColumnProductImage">
                           {% if item.image %}
